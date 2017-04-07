@@ -168,4 +168,10 @@ void keyboard()
 		snake_x[3] += 0;
 		snake_y[3] += 1;
 	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
+	{
+		snake_x[3] = 30;
+		snake_y[3] = 30;
+	}
 }
