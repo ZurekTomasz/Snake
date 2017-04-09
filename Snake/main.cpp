@@ -8,8 +8,9 @@ void keyboard();
 int lwierszy = 96;
 int lkolumn = 54;
 char mapa[96][54];
-int snake_x[4];
-int snake_y[4];
+int snake_dlugosc = 2;
+int snake_x[30];
+int snake_y[30];
 int szer_klocka = 20;
 int kierunek = 4; //stop-0,lewo-1,gora-2,dol-3,prawo-4
 int punkt_x = 50;
@@ -61,16 +62,13 @@ int main()
 	sf::Sprite fiolet;
 	fiolet.setTexture(t_fiolet);
 	//Inicjacja//
-
-	snake_x[0] = 13;
-	snake_y[0] = 10;
-	snake_x[1] = 12;
-	snake_y[1] = 10;
-	snake_x[2] = 11;
-	snake_y[2] = 10;
-	snake_x[3] = 10;
-	snake_y[3] = 10;
 	
+	for (int i = 0; i < snake_dlugosc; i++)
+	{
+		snake_x[i] = 30 - i;
+		snake_y[i] = 10;
+	}
+
 	sf::Clock clock;
 	while (renderWindow.isOpen())
 	{
@@ -78,7 +76,7 @@ int main()
 
 		if (t1.asMilliseconds() > 30.0f)
 		{
-			for (int i = 3; i > 0; i--)
+			for (int i = snake_dlugosc - 1; i > 0; i--)
 			{
 				int iv = i - 1;
 				snake_x[i] = snake_x[iv];
@@ -122,6 +120,7 @@ int main()
 		{
 			punkty++;
 			printf("Punkty: %i\n", punkty);
+			snake_dlugosc++;
 			punkt_x = rand() % 90 + 3;
 			punkt_y = rand() % 50 + 3;
 		}
@@ -139,9 +138,12 @@ int main()
 		}
 		
 		mapa[snake_x[0]][snake_y[0]] = '1';
-		mapa[snake_x[1]][snake_y[1]] = '2';
-		mapa[snake_x[2]][snake_y[2]] = '2';
-		mapa[snake_x[3]][snake_y[3]] = '2';
+		for (int i = 1; i < snake_dlugosc; i++)
+		{
+			mapa[snake_x[i]][snake_y[i]] = '2';
+		}
+
+		
 
 		mapa[punkt_x][punkt_y] = '3';
 
