@@ -149,7 +149,7 @@ int main()
 		if(snake_x[0] == punkt_x && snake_y[0] == punkt_y)
 		{
 			punkty++;
-			printf("Punkty: %i\n", punkty);
+			//printf("Punkty: %i\n", punkty);
 			s_punkty = "Punkty: " + std::to_string(punkty);
 			text.setString(s_punkty);
 
@@ -159,10 +159,6 @@ int main()
 		}
 
 		keyboard();
-
-		
-		
-		
 
 		for (int a = 0; a < 96; a++)
 		{
@@ -286,7 +282,7 @@ void keyboard()
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 	{
-		//if(kierunek!=4)
+		if(kierunek!=4)
 		kierunek = 1;
 	}
 
@@ -304,7 +300,7 @@ void keyboard()
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{
-		//if (kierunek != 1)
+		if (kierunek != 1)
 		kierunek = 4;
 	}
 

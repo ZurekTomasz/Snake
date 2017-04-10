@@ -50,3 +50,4 @@ Temporary Items
 *.opendb
 Debug/
 Snake/Debug/
+Release/
