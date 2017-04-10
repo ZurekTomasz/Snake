@@ -1,13 +1,15 @@
 #include "stdafx.h"
 
-sf::RenderWindow renderWindow(sf::VideoMode(1920, 1080), "Snake");
+sf::RenderWindow renderWindow(sf::VideoMode(1280, 720), "Snake");
 sf::Event event;
+sf::Text text;
 
 void keyboard();
 
 int lwierszy = 96;
 int lkolumn = 54;
 char mapa[96][54];
+char przeszkoda[96][54];
 int snake_dlugosc = 2;
 int snake_x[30];
 int snake_y[30];
@@ -16,6 +18,7 @@ int kierunek = 4; //stop-0,lewo-1,gora-2,dol-3,prawo-4
 int punkt_x = 50;
 int punkt_y = 10;
 int punkty = 0;
+string s_punkty = "Punkty: 0";
 
 int main()
 {
@@ -26,6 +29,12 @@ int main()
 	renderWindow.setFramerateLimit(60);
 
 	//Ladowanie tekstur
+	sf::Font font;
+	if (!font.loadFromFile("arial.ttf"))
+	{
+		// error...
+	}
+
 	sf::Texture t_tlo;
 	if (!t_tlo.loadFromFile("grafika/tlo.png"))
 		return EXIT_FAILURE;
@@ -61,6 +70,14 @@ int main()
 		return EXIT_FAILURE;
 	sf::Sprite fiolet;
 	fiolet.setTexture(t_fiolet);
+
+	text.setFont(font);
+	text.setCharacterSize(36);
+	text.setFillColor(sf::Color::Blue);
+	text.setPosition(30, 30);
+	text.setStyle(sf::Text::Bold);
+	text.setString(s_punkty);
+
 	//Inicjacja//
 	
 	for (int i = 0; i < snake_dlugosc; i++)
@@ -70,11 +87,23 @@ int main()
 	}
 
 	sf::Clock clock;
+
 	while (renderWindow.isOpen())
 	{
+		renderWindow.clear();
+
+		for (int a = 0; a < 96; a++)
+		{
+			for (int b = 0; b < 54; b++)
+			{
+				przeszkoda[a][b] = '0';
+				mapa[a][b] = '0';
+			}
+		}
+
 		sf::Time t1 = clock.getElapsedTime();
 
-		if (t1.asMilliseconds() > 30.0f)
+		if (t1.asMilliseconds() > 100.0f)
 		{
 			for (int i = snake_dlugosc - 1; i > 0; i--)
 			{
@@ -108,18 +137,22 @@ int main()
 			}
 			clock.restart();
 		}
-
+		/*
 		if (snake_y[0] == 53 || snake_y[0] == 0 || snake_x[0] == 0 || snake_x[0] == 95)
 		{
 			printf("Game Over\n");
 			exit(1);
 			_getch();
 		}
+		*/
 
 		if(snake_x[0] == punkt_x && snake_y[0] == punkt_y)
 		{
 			punkty++;
 			printf("Punkty: %i\n", punkty);
+			s_punkty = "Punkty: " + std::to_string(punkty);
+			text.setString(s_punkty);
+
 			snake_dlugosc++;
 			punkt_x = rand() % 90 + 3;
 			punkt_y = rand() % 50 + 3;
@@ -127,57 +160,85 @@ int main()
 
 		keyboard();
 
-		renderWindow.clear();
+		
+		
+		
 
 		for (int a = 0; a < 96; a++)
 		{
-			for (int b = 0; b < 54; b++)
-			{
-				mapa[a][b] = '0';
-			}
+			przeszkoda[a][0] = '4';
+			mapa[a][0] = '4';
 		}
-		
+
+		for (int a = 0; a < 96; a++)
+		{ 
+			przeszkoda[a][53] = '4';
+			mapa[a][53] = '4';
+		}
+
+		for (int a = 0; a < 54; a++)
+		{
+			przeszkoda[0][a] = '4';
+			mapa[0][a] = '4';
+		}
+
+		for (int a = 0; a < 54; a++)
+		{
+			przeszkoda[95][a] = '4';
+			mapa[95][a] = '4';
+		}
+
+		/*
+		for (int a = 0; a < 54; a++)
+		{
+			przeszkoda[35][a] = '4';
+			mapa[35][a] = '4';
+		}
+
+		for (int a = 0; a < 54; a++)
+		{
+			przeszkoda[45][a] = '2';
+			mapa[45][a] = '2';
+		}
+		*/
+
 		mapa[snake_x[0]][snake_y[0]] = '1';
 		for (int i = 1; i < snake_dlugosc; i++)
 		{
 			mapa[snake_x[i]][snake_y[i]] = '2';
 		}
 
-		
-
 		mapa[punkt_x][punkt_y] = '3';
 
-		for (int a = 0; a < 96; a++)
+		for (int a = 1; a < snake_dlugosc; a++)
 		{
-			mapa[a][0] = '4';
+			if (snake_x[0] == snake_x[a] && snake_y[0] == snake_y[a])
+			{
+				printf("Kolizja z ogonem\n");
+				exit(1);
+			}
 		}
-
-		for (int a = 0; a < 96; a++)
-		{ 
-			mapa[a][53] = '4';
-		}
-
-		for (int a = 0; a < 54; a++)
-		{
-			mapa[0][a] = '4';
-		}
-
-		for (int a = 0; a < 54; a++)
-		{
-			mapa[95][a] = '4';
-		}
-		
 
 		for (int a = 0; a < 96; a++)
 		{
 			for (int b = 0; b < 54; b++)
 			{
+
 				if (mapa[a][b] == '0')
 				{
 					trawa.setPosition(a * szer_klocka, b * szer_klocka);
 					renderWindow.draw(trawa);
 				}
-
+				
+				if (mapa[a][b] == '1')
+				{
+					if (przeszkoda[a][b] == '4' || przeszkoda[a][b] == '2')
+					{
+						printf("Kolizja zwykla\n");
+						exit(1);
+					}
+				}
+				
 				if (mapa[a][b] == '1')
 				{
 					czerwone.setPosition(a * szer_klocka, b * szer_klocka);
@@ -204,9 +265,9 @@ int main()
 			}
 			
 		}
-		
+		renderWindow.draw(text);
 		renderWindow.display();
-
+		
 	}
 
 	//_getch();
@@ -225,7 +286,7 @@ void keyboard()
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
 	{
-		if(kierunek!=4)
+		//if(kierunek!=4)
 		kierunek = 1;
 	}
 
@@ -243,7 +304,7 @@ void keyboard()
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
 	{
-		if (kierunek != 1)
+		//if (kierunek != 1)
 		kierunek = 4;
 	}
 
