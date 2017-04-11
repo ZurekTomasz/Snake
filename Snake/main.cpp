@@ -12,8 +12,8 @@ int lkolumn = 54;
 char mapa[96][54];
 char przeszkoda[96][54];
 int snake_dlugosc = 2;
-int snake_x[30];
-int snake_y[30];
+int snake_x[90];
+int snake_y[90];
 int szer_klocka = 20;
 int kierunek = 4; //stop-0,lewo-1,gora-2,dol-3,prawo-4
 int punkt_x = 50;
