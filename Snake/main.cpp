@@ -12,8 +12,8 @@ int lkolumn = 54;
 char mapa[96][54];
 char przeszkoda[96][54];
 int snake_dlugosc = 2;
-int snake_x[30];
-int snake_y[30];
+int snake_x[90];//Maksymalna dlugosc weza
+int snake_y[90];
 int szer_klocka = 20;
 int kierunek = 4; //stop-0,lewo-1,gora-2,dol-3,prawo-4
 int punkt_x = 50;
@@ -84,6 +84,20 @@ int main()
 		return EXIT_FAILURE;
 	sf::Sprite fiolet;
 	fiolet.setTexture(t_fiolet);
+
+	//
+	// Load an image file from a file
+	sf::Image background;
+	background.loadFromFile("grafika/image1.bmp");
+
+	sf::Image image;
+	image.create((int)background.getSize().x, (int)background.getSize().y, sf::Color::Black);
+	image.copy(background, 0, 0);
+	sf::Color color = image.getPixel(10, 90);
+	cout << "R: " << (int)color.r << endl << "G: " << (int)color.g << endl << "B: " << (int)color.b << endl;
+	image.saveToFile("grafika/result.png");
+
+
 
 	text.setFont(font);
 	text.setCharacterSize(48);
@@ -280,7 +294,22 @@ int main()
 				}
 
 			}
+			
 			renderWindow.draw(text);
+
+			sf::Vector2u windowSize = renderWindow.getSize();
+			sf::Texture texture;
+			texture.create(windowSize.x, windowSize.y);
+			texture.update(renderWindow);
+			sf::Image screenshot = texture.copyToImage();
+
+			//screenshot.saveToFile("grafika/result.png");
+			//476x142
+
+			sf::Color color2 = screenshot.getPixel(476, 142);
+			cout << "R: " << (int)color2.r  << "G: " << (int)color2.g  << "B: " << (int)color2.b << endl;
+			//_getch();
+
 			renderWindow.display();
 		}
 		else if(menugry==1)
@@ -326,25 +355,33 @@ void keyboard()
 			renderWindow.close();
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) || sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 	{
 		if(kierunek!=4)
 		kierunek = 1;
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 	{
+		//sf::Image screenshot;
+		//screenshot = renderWindow.capture();
+		//screenshot.saveToFile("grafika/result.png");
+
+		//renderWindow.capture().saveToFile("grafika/result.png");
+
+		
+
 		if (kierunek != 3)
 		kierunek = 2;
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 	{
 		if (kierunek != 2)
 		kierunek = 3;
 	}
 
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 	{
 		if (kierunek != 1)
 		kierunek = 4;
