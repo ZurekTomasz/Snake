@@ -1,42 +1,60 @@
 #include "stdafx.h"
 
 sf::RenderWindow renderWindow(sf::VideoMode(1280, 720), "Snake");
-sf::Event event;
-sf::Text text;
-sf::Font font; 
+sf::View view1(sf::FloatRect(0, 0, 1920, 1080));
+
+sf::Event event1;
+sf::Text text1;
+sf::Font font1; 
+
+class Snake
+{
+	public:
+		#define max_length 100
+		int length = 2;
+		int start_x = 30;
+		int start_y = 10;
+		int x[max_length];//Maksymalna dlugosc weza
+		int y[max_length];
+		int direction = 4; //stop-0,lewo-1,gora-2,dol-3,prawo-4
+		int point_x = 50;
+		int point_y = 10;
+		int points = 0;
+};
+
+Snake snake1;
+
+class Board
+{
+	public:
+		int row = 96;
+		int column = 54;
+		char map[96][54];
+		char obstacle[96][54];
+		int width_block = 20;
+		int game_menu = 1;
+		string s_points = "POINTS: 0";
+};
+
+Board board1;
 
 void keyboard();
+void label(int x = 0, int y = 0, string s = "None", int size = 72);
+void clear_level();
 
-int lwierszy = 96;
-int lkolumn = 54;
-char mapa[96][54];
-char przeszkoda[96][54];
-int snake_dlugosc = 2;
-int snake_x[90];//Maksymalna dlugosc weza
-int snake_y[90];
-int szer_klocka = 20;
-int kierunek = 4; //stop-0,lewo-1,gora-2,dol-3,prawo-4
-int punkt_x = 50;
-int punkt_y = 10;
-int punkty = 0;
-int menugry = 1;
-string s_punkty = "POINTS: 0";
 
 int main()
 {
-	//Inicjacja//
-	sf::View view1(sf::FloatRect(0, 0, 1920, 1080));
+	//Initiation//
 	renderWindow.setView(view1);
-
 	renderWindow.setFramerateLimit(60);
+	sf::Clock clock;
 
-	//Ladowanie tekstur
-	
-	if (!font.loadFromFile("arial.ttf"))
-	{
-		// error...
-	}
+	//Load font
+	if (!font1.loadFromFile("arial.ttf"))
+		return EXIT_FAILURE;
 
+	//Load texture
 	sf::Texture t_tlo;
 	if (!t_tlo.loadFromFile("grafika/tlo.png"))
 		return EXIT_FAILURE;
@@ -85,270 +103,233 @@ int main()
 	sf::Sprite fiolet;
 	fiolet.setTexture(t_fiolet);
 
-	//
-	// Load an image file from a file
-	sf::Image background;
-	background.loadFromFile("grafika/image1.bmp");
-
-	sf::Image image;
-	image.create((int)background.getSize().x, (int)background.getSize().y, sf::Color::Black);
-	image.copy(background, 0, 0);
-	sf::Color color = image.getPixel(10, 90);
-	cout << "R: " << (int)color.r << endl << "G: " << (int)color.g << endl << "B: " << (int)color.b << endl;
-	image.saveToFile("grafika/result.png");
-
-
-
-	text.setFont(font);
-	text.setCharacterSize(48);
-	text.setFillColor(sf::Color::Blue);
-	text.setPosition(30, 30);
-	text.setStyle(sf::Text::Bold);
-	text.setString(s_punkty);
-
-	//Inicjacja//
 	
-	for (int i = 0; i < snake_dlugosc; i++)
-	{
-		snake_x[i] = 30 - i;
-		snake_y[i] = 10;
-	}
-
-	sf::Clock clock;
-
 	while (renderWindow.isOpen())
 	{
 		renderWindow.clear();
+		keyboard();
 
-		if (menugry == 0)
+		switch (board1.game_menu)
 		{
-
-			for (int a = 0; a < 96; a++)
+			case 0:
 			{
-				for (int b = 0; b < 54; b++)
+				for (int a = 0; a < 96; a++)
 				{
-					przeszkoda[a][b] = '0';
-					mapa[a][b] = '0';
-				}
-			}
-
-			sf::Time t1 = clock.getElapsedTime();
-
-			if (t1.asMilliseconds() > 100.0f)
-			{
-				for (int i = snake_dlugosc - 1; i > 0; i--)
-				{
-					int iv = i - 1;
-					snake_x[i] = snake_x[iv];
-					snake_y[i] = snake_y[iv];
-				}
-
-				if (kierunek == 1)
-				{
-					snake_x[0] -= 1;
-					snake_y[0] += 0;
-				}
-
-				if (kierunek == 2)
-				{
-					snake_x[0] += 0;
-					snake_y[0] -= 1;
-				}
-
-				if (kierunek == 3)
-				{
-					snake_x[0] += 0;
-					snake_y[0] += 1;
-				}
-
-				if (kierunek == 4)
-				{
-					snake_x[0] += 1;
-					snake_y[0] += 0;
-				}
-				clock.restart();
-			}
-
-			if (snake_x[0] == punkt_x && snake_y[0] == punkt_y)
-			{
-				punkty++;
-				//printf("Punkty: %i\n", punkty);
-
-				snake_dlugosc++;
-				punkt_x = rand() % 90 + 3;
-				punkt_y = rand() % 50 + 3;
-			}
-
-			text.setFont(font);
-			text.setCharacterSize(48);
-			text.setFillColor(sf::Color::Blue);
-			text.setPosition(30, 30);
-			text.setStyle(sf::Text::Bold);
-			text.setString(s_punkty);
-
-			s_punkty = "POINTS: " + std::to_string(punkty);
-			text.setString(s_punkty);
-
-			keyboard();
-
-			for (int a = 0; a < 96; a++)
-			{
-				przeszkoda[a][0] = '4';
-				mapa[a][0] = '4';
-			}
-
-			for (int a = 0; a < 96; a++)
-			{
-				przeszkoda[a][53] = '4';
-				mapa[a][53] = '4';
-			}
-
-			for (int a = 0; a < 54; a++)
-			{
-				przeszkoda[0][a] = '4';
-				mapa[0][a] = '4';
-			}
-
-			for (int a = 0; a < 54; a++)
-			{
-				przeszkoda[95][a] = '4';
-				mapa[95][a] = '4';
-			}
-
-			/*
-			for (int a = 0; a < 54; a++)
-			{
-				przeszkoda[35][a] = '4';
-				mapa[35][a] = '4';
-			}
-
-			for (int a = 0; a < 54; a++)
-			{
-				przeszkoda[45][a] = '2';
-				mapa[45][a] = '2';
-			}
-			*/
-
-			mapa[snake_x[0]][snake_y[0]] = '1';
-			for (int i = 1; i < snake_dlugosc; i++)
-			{
-				mapa[snake_x[i]][snake_y[i]] = '2';
-			}
-
-			mapa[punkt_x][punkt_y] = '3';
-
-			for (int a = 1; a < snake_dlugosc; a++)
-			{
-				if (snake_x[0] == snake_x[a] && snake_y[0] == snake_y[a])
-				{
-					printf("Kolizja z ogonem\n");
-					menugry = 2;
-					//exit(1);
-				}
-			}
-
-			for (int a = 0; a < 96; a++)
-			{
-				for (int b = 0; b < 54; b++)
-				{
-
-					if (mapa[a][b] == '0')
+					for (int b = 0; b < 54; b++)
 					{
-						trawa.setPosition(a * szer_klocka, b * szer_klocka);
-						renderWindow.draw(trawa);
+						board1.obstacle[a][b] = '0';
+						board1.map[a][b] = '0';
+					}
+				}
+
+
+				sf::Time t1 = clock.getElapsedTime();
+				if (t1.asMilliseconds() > 1000.0f / 10.0f)
+				{
+					for (int i = snake1.length - 1; i > 0; i--)
+					{
+						snake1.x[i] = snake1.x[i-1];
+						snake1.y[i] = snake1.y[i-1];
 					}
 
-					if (mapa[a][b] == '1')
+					if (snake1.direction == 1)
 					{
-						if (przeszkoda[a][b] == '4' || przeszkoda[a][b] == '2')
+						snake1.x[0] -= 1;
+						snake1.y[0] += 0;
+					}
+
+					if (snake1.direction == 2)
+					{
+						snake1.x[0] += 0;
+						snake1.y[0] -= 1;
+					}
+
+					if (snake1.direction == 3)
+					{
+						snake1.x[0] += 0;
+						snake1.y[0] += 1;
+					}
+
+					if (snake1.direction == 4)
+					{
+						snake1.x[0] += 1;
+						snake1.y[0] += 0;
+					}
+					clock.restart();
+				}
+
+				if (snake1.x[0] == snake1.point_x && snake1.y[0] == snake1.point_y)
+				{
+					snake1.points++;
+					snake1.length++;
+					snake1.point_x = rand() % 90 + 3;
+					snake1.point_y = rand() % 50 + 3;
+				}
+
+				board1.s_points = "POINTS: " + std::to_string(snake1.points);
+				label(30, 30, board1.s_points, 48);
+
+				for (int a = 0; a < 96; a++)
+				{
+					board1.obstacle[a][0] = '4';
+					board1.map[a][0] = '4';
+				}
+
+				for (int a = 0; a < 96; a++)
+				{
+					board1.obstacle[a][53] = '4';
+					board1.map[a][53] = '4';
+				}
+
+				for (int a = 0; a < 54; a++)
+				{
+					board1.obstacle[0][a] = '4';
+					board1.map[0][a] = '4';
+				}
+
+				for (int a = 0; a < 54; a++)
+				{
+					board1.obstacle[95][a] = '4';
+					board1.map[95][a] = '4';
+				}
+
+				/*
+				for (int a = 0; a < 54; a++)
+				{
+					obstacle[35][a] = '4';
+					map[35][a] = '4';
+				}
+
+				for (int a = 0; a < 54; a++)
+				{
+					obstacle[45][a] = '2';
+					map[45][a] = '2';
+				}
+				*/
+
+				board1.map[snake1.x[0]][snake1.y[0]] = '1';//Kolor dziubka
+				for (int i = 1; i < snake1.length; i++)
+				{
+					board1.map[snake1.x[i]][snake1.y[i]] = '2';//Kolor ogona
+				}
+
+				board1.map[snake1.point_x][snake1.point_y] = '3';//Kolor punkta
+
+				for (int a = 1; a < snake1.length; a++)
+				{
+					if (snake1.x[0] == snake1.x[a] && snake1.y[0] == snake1.y[a])
+					{
+						printf("Kolizja z ogonem\n");
+						board1.game_menu = 2;
+					}
+				}
+
+				for (int a = 0; a < 96; a++)
+				{
+					for (int b = 0; b < 54; b++)
+					{
+
+						if (board1.map[a][b] == '0')
 						{
-							printf("Kolizja zwykla\n");
-							menugry = 2;
-							//exit(1);
+							trawa.setPosition(a * board1.width_block, b * board1.width_block);
+							renderWindow.draw(trawa);
+						}
+
+						if (board1.map[a][b] == '1')
+						{
+							if (board1.obstacle[a][b] == '4' || board1.obstacle[a][b] == '2')
+							{
+								printf("Kolizja zwykla\n");
+								board1.game_menu = 2;
+							}
+
+							czerwone.setPosition(a * board1.width_block, b * board1.width_block);
+							renderWindow.draw(czerwone);
+						}
+
+						if (board1.map[a][b] == '2')
+						{
+							niebieskie.setPosition(a * board1.width_block, b * board1.width_block);
+							renderWindow.draw(niebieskie);
+						}
+
+						if (board1.map[a][b] == '3')
+						{
+							zolte.setPosition(a * board1.width_block, b * board1.width_block);
+							renderWindow.draw(zolte);
+						}
+
+						if (board1.map[a][b] == '4')
+						{
+							fiolet.setPosition(a * board1.width_block, b * board1.width_block);
+							renderWindow.draw(fiolet);
 						}
 					}
 
-					if (mapa[a][b] == '1')
-					{
-						czerwone.setPosition(a * szer_klocka, b * szer_klocka);
-						renderWindow.draw(czerwone);
-					}
-
-					if (mapa[a][b] == '2')
-					{
-						niebieskie.setPosition(a * szer_klocka, b * szer_klocka);
-						renderWindow.draw(niebieskie);
-					}
-
-					if (mapa[a][b] == '3')
-					{
-						zolte.setPosition(a * szer_klocka, b * szer_klocka);
-						renderWindow.draw(zolte);
-					}
-
-					if (mapa[a][b] == '4')
-					{
-						fiolet.setPosition(a * szer_klocka, b * szer_klocka);
-						renderWindow.draw(fiolet);
-					}
 				}
 
+
+				renderWindow.draw(text1);
 			}
-			
-			renderWindow.draw(text);
+			break;
 
-			sf::Vector2u windowSize = renderWindow.getSize();
-			sf::Texture texture;
-			texture.create(windowSize.x, windowSize.y);
-			texture.update(renderWindow);
-			sf::Image screenshot = texture.copyToImage();
+			case 1:
+			{
+				renderWindow.draw(menu);
+			}
+			break;
 
-			//screenshot.saveToFile("grafika/result.png");
-			//476x142
+			case 2:
+			{
+				renderWindow.draw(loss);
 
-			sf::Color color2 = screenshot.getPixel(476, 142);
-			cout << "R: " << (int)color2.r  << "G: " << (int)color2.g  << "B: " << (int)color2.b << endl;
-			//_getch();
+				board1.s_points = "POINTS: " + std::to_string(snake1.points) + "     PRESS 'X' TO START THE GAME";
+				label(50, 300, board1.s_points, 72);
 
-			renderWindow.display();
+				renderWindow.draw(text1);
+			}
+			break;
+
 		}
-		else if(menugry==1)
-		{
-
-			keyboard();
-			renderWindow.clear();
-			renderWindow.draw(menu);
-			renderWindow.display();
-		}
-		else
-		{
-
-			keyboard();
-			renderWindow.clear();
-			renderWindow.draw(loss);
-
-			text.setFont(font);
-			text.setCharacterSize(72);
-			text.setFillColor(sf::Color::Blue);
-			text.setPosition(50, 300);
-			text.setStyle(sf::Text::Bold);
-			text.setString(s_punkty);
-			s_punkty = "POINTS: " + std::to_string(punkty) + "     PRESS 'X' TO START THE GAME";
-			text.setString(s_punkty);
-			renderWindow.draw(text);
-
-			renderWindow.display();
-		}
+		renderWindow.display();
 	}
 
-	//_getch();
 	return 0;
+}
+
+void clear_level()
+{
+	snake1.length = 2;
+	snake1.direction = 4; //stop-0,lewo-1,gora-2,dol-3,prawo-4
+	snake1.point_x = 50;
+	snake1.point_y = 10;
+	snake1.points = 0;
+	board1.s_points = "POINTS: 0";
+	label(30, 30, board1.s_points, 48);
+	
+	for (int i = 0; i < snake1.length; i++)
+	{
+		snake1.x[i] = snake1.start_x - i;
+		snake1.y[i] = snake1.start_y;
+	}
+
+	board1.game_menu = 0;
+}
+
+void label(int x, int y, string s, int size)
+{
+	text1.setFont(font1);
+	text1.setFillColor(sf::Color::Blue);
+	text1.setStyle(sf::Text::Bold);
+	text1.setPosition(x, y);
+	text1.setCharacterSize(size);
+	text1.setString(s);
 }
 
 void keyboard()
 {
-	while (renderWindow.pollEvent(event)) {
-		if (event.type == sf::Event::EventType::Closed)
+	while (renderWindow.pollEvent(event1)) {
+		if (event1.type == sf::Event::EventType::Closed)
 			renderWindow.close();
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
@@ -357,68 +338,77 @@ void keyboard()
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) || sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 	{
-		if(kierunek!=4)
-		kierunek = 1;
+		if(snake1.direction!=4)
+			snake1.direction = 1;
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) || sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 	{
-		//sf::Image screenshot;
-		//screenshot = renderWindow.capture();
-		//screenshot.saveToFile("grafika/result.png");
-
-		//renderWindow.capture().saveToFile("grafika/result.png");
-
-		
-
-		if (kierunek != 3)
-		kierunek = 2;
+		if (snake1.direction != 3)
+			snake1.direction = 2;
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) || sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
 	{
-		if (kierunek != 2)
-		kierunek = 3;
+		if (snake1.direction != 2)
+			snake1.direction = 3;
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) || sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 	{
-		if (kierunek != 1)
-		kierunek = 4;
+		if (snake1.direction != 1)
+			snake1.direction = 4;
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::X))
 	{
-		if (menugry != 0)
+		if (board1.game_menu != 0)
 		{
-			text.setFont(font);
-			text.setCharacterSize(48);
-			text.setFillColor(sf::Color::Blue);
-			text.setPosition(30, 30);
-			text.setStyle(sf::Text::Bold);
-			text.setString(s_punkty);
-
-			lwierszy = 96;
-			lkolumn = 54;
-			mapa[96][54];
-			przeszkoda[96][54];
-			snake_dlugosc = 2;
-			snake_x[30];
-			snake_y[30];
-			szer_klocka = 20;
-			kierunek = 4; //stop-0,lewo-1,gora-2,dol-3,prawo-4
-			punkt_x = 50;
-			punkt_y = 10;
-			s_punkty = "POINTS: 0";
-			punkty = 0;
-
-			for (int i = 0; i < snake_dlugosc; i++)
-			{
-				snake_x[i] = 30 - i;
-				snake_y[i] = 10;
-			}
-
-			menugry = 0;
+			clear_level();
 		}
 	}
 }
+
+
+
+/*
+sf::Vector2u windowSize = renderWindow.getSize();
+sf::Texture texture;
+texture.create(windowSize.x, windowSize.y);
+texture.update(renderWindow);
+sf::Image screenshot = texture.copyToImage();
+
+
+//screenshot.saveToFile("grafika/result.png");
+//476x142
+
+sf::Color color2 = screenshot.getPixel(476, 142);
+cout << "R: " << (int)color2.r  << "G: " << (int)color2.g  << "B: " << (int)color2.b << endl;
+//_getch();
+*/
+
+/*
+// Load an image file from a file
+sf::Image background;
+background.loadFromFile("grafika/image1.bmp");
+
+sf::Image image;
+image.create((int)background.getSize().x, (int)background.getSize().y, sf::Color::Black);
+image.copy(background, 0, 0);
+sf::Color color = image.getPixel(10, 90);
+cout << "R: " << (int)color.r << endl << "G: " << (int)color.g << endl << "B: " << (int)color.b << endl;
+image.saveToFile("grafika/result.png");
+
+for (int i = 0; i < snake1.length; i++)
+{
+snake1.x[i] = 30 - i;
+snake1.y[i] = 10;
+}
+*/
+
+/*
+sf::Image screenshot;
+screenshot = renderWindow.capture();
+screenshot.saveToFile("grafika/result.png");
+renderWindow.capture().saveToFile("grafika/result.png");
+*/
