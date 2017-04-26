@@ -1,6 +1,6 @@
 ## General
 Snake game written in C++ language, using SFML library. <br />
-The project was created in Microsoft Visual Studio 2015.
+The project was created in Microsoft Visual Studio 2015. <br />
 The game is in the process of creating.
 
 ## Screens
