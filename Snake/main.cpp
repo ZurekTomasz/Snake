@@ -28,11 +28,14 @@ Snake snake1;
 class Board
 {
 	public:
-		int row = 98; //96+2
-		int column = 56; //54+2
-		char map[98][56];
-		char obstacle[98][56];
+		#define d_row 98 //96+2
+		#define d_column 56 //54+2
+		int row = d_row;
+		int column = d_column;
+		char map[d_row][d_column];
+		char obstacle[d_row][d_column];
 		int width_block = 20;
+
 		int game_menu = 1;
 		string s_points = "POINTS: 0";
 };
@@ -204,14 +207,14 @@ int main()
 				}
 
 				//Drawing map
-				for (int a = 0; a < 98; a++)
+				for (int a = 0; a < board1.row; a++)
 				{
-					for (int b = 0; b < 56; b++)
+					for (int b = 0; b < board1.column; b++)
 					{
 
 						if (board1.map[a][b] == '0')
 						{
-							trawa.setPosition(a * board1.width_block - 20, b * board1.width_block -  20);
+							trawa.setPosition(a * board1.width_block - board1.width_block, b * board1.width_block - board1.width_block);
 							renderWindow.draw(trawa);
 						}
 
@@ -223,31 +226,31 @@ int main()
 								board1.game_menu = 2;
 							}
 
-							czerwone.setPosition(a * board1.width_block - 20, b * board1.width_block - 20);
+							czerwone.setPosition(a * board1.width_block - board1.width_block, b * board1.width_block - board1.width_block);
 							renderWindow.draw(czerwone);
 						}
 
 						if (board1.map[a][b] == '2')
 						{
-							niebieskie.setPosition(a * board1.width_block - 20, b * board1.width_block - 20);
+							niebieskie.setPosition(a * board1.width_block - board1.width_block, b * board1.width_block - board1.width_block);
 							renderWindow.draw(niebieskie);
 						}
 
 						if (board1.map[a][b] == '3')
 						{
-							fiolet.setPosition(a * board1.width_block - 20, b * board1.width_block - 20);
+							fiolet.setPosition(a * board1.width_block - board1.width_block, b * board1.width_block - board1.width_block);
 							renderWindow.draw(fiolet);
 						}
 
 						if (board1.map[a][b] == '4')
 						{
-							zolte.setPosition(a * board1.width_block - 20, b * board1.width_block - 20);
+							zolte.setPosition(a * board1.width_block - board1.width_block, b * board1.width_block - board1.width_block);
 							renderWindow.draw(zolte);
 						}
 
 						if (board1.map[a][b] == '5')
 						{
-							biel.setPosition(a * board1.width_block - 20, b * board1.width_block - 20);
+							biel.setPosition(a * board1.width_block - board1.width_block, b * board1.width_block - board1.width_block);
 							renderWindow.draw(biel);
 						}
 					}
@@ -255,7 +258,7 @@ int main()
 				}
 
 				//No walls
-				if (snake1.x[0] >= 97)
+				if (snake1.x[0] >= board1.row - 1)
 				{
 					if (snake1.direction != 1)
 						snake1.x[0] = 1;
@@ -263,9 +266,9 @@ int main()
 				if (snake1.x[0] <= 0)
 				{
 					if (snake1.direction != 4)
-						snake1.x[0] = 96;
+						snake1.x[0] = board1.row - 2;
 				}
-				if (snake1.y[0] >= 55)
+				if (snake1.y[0] >= board1.column - 1)
 				{
 					if (snake1.direction != 2)
 						snake1.y[0] = 1;
@@ -273,7 +276,7 @@ int main()
 				if (snake1.y[0] <= 0)
 				{
 					if (snake1.direction != 3)
-						snake1.y[0] = 54;
+						snake1.y[0] = board1.column - 2;
 				}
 
 
@@ -317,9 +320,9 @@ void clear_level()
 
 	//Map generator
 	lvl1.load();
-	for (int a = 0; a < 98; a++)
+	for (int a = 0; a < board1.row; a++)
 	{
-		for (int b = 0; b < 56; b++)
+		for (int b = 0; b < board1.column; b++)
 		{
 			board1.map[a][b] = lvl1.matrix[b][a][0];
 			board1.obstacle[a][b] = lvl1.matrix[b][a][0];
