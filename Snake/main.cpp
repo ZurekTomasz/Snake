@@ -2,7 +2,7 @@
 
 sf::RenderWindow renderWindow(sf::VideoMode(1280, 720), "Snake");
 sf::View view1(sf::FloatRect(0, 0, 1920, 1080));
-Files lvl1("lvl1.csv", ',');
+Files lvl1("lvl2.csv", ',');
 
 sf::Event event1;
 sf::Text text1;
@@ -28,10 +28,10 @@ Snake snake1;
 class Board
 {
 	public:
-		int row = 96;
-		int column = 54;
-		char map[96][54];
-		char obstacle[96][54];
+		int row = 98; //96+2
+		int column = 56; //54+2
+		char map[98][56];
+		char obstacle[98][56];
 		int width_block = 20;
 		int game_menu = 1;
 		string s_points = "POINTS: 0";
@@ -104,6 +104,12 @@ int main()
 	sf::Sprite fiolet;
 	fiolet.setTexture(t_fiolet);
 
+	sf::Texture t_biel;
+	if (!t_biel.loadFromFile("grafika/biel.png"))
+		return EXIT_FAILURE;
+	sf::Sprite biel;
+	biel.setTexture(t_biel);
+
 	//LOGIC//
 	while (renderWindow.isOpen())
 	{
@@ -158,8 +164,21 @@ int main()
 				{
 					snake1.points++;
 					snake1.length++;
-					snake1.point_x = rand() % 90 + 3;
-					snake1.point_y = rand() % 50 + 3;
+
+					bool coltail = false;
+					do 
+					{
+						coltail = false;;
+						snake1.point_x = rand() % 96 + 2;
+						snake1.point_y = rand() % 54 + 2;
+
+						for (int a = 1; a < snake1.length; a++)
+						{
+							if (snake1.point_x == snake1.x[a] && snake1.point_y == snake1.y[a])
+								coltail = true;
+						}
+
+					} while (board1.obstacle[snake1.point_x][snake1.point_y] != '0' || coltail == true);
 
 					board1.s_points = "POINTS: " + std::to_string(snake1.points);
 					cout << board1.s_points << endl;
@@ -183,16 +202,16 @@ int main()
 						board1.game_menu = 2;
 					}
 				}
-				
+
 				//Drawing map
-				for (int a = 0; a < 96; a++)
+				for (int a = 0; a < 98; a++)
 				{
-					for (int b = 0; b < 54; b++)
+					for (int b = 0; b < 56; b++)
 					{
 
 						if (board1.map[a][b] == '0')
 						{
-							trawa.setPosition(a * board1.width_block, b * board1.width_block);
+							trawa.setPosition(a * board1.width_block - 20, b * board1.width_block -  20);
 							renderWindow.draw(trawa);
 						}
 
@@ -204,29 +223,57 @@ int main()
 								board1.game_menu = 2;
 							}
 
-							czerwone.setPosition(a * board1.width_block, b * board1.width_block);
+							czerwone.setPosition(a * board1.width_block - 20, b * board1.width_block - 20);
 							renderWindow.draw(czerwone);
 						}
 
 						if (board1.map[a][b] == '2')
 						{
-							niebieskie.setPosition(a * board1.width_block, b * board1.width_block);
+							niebieskie.setPosition(a * board1.width_block - 20, b * board1.width_block - 20);
 							renderWindow.draw(niebieskie);
 						}
 
 						if (board1.map[a][b] == '3')
 						{
-							fiolet.setPosition(a * board1.width_block, b * board1.width_block);
+							fiolet.setPosition(a * board1.width_block - 20, b * board1.width_block - 20);
 							renderWindow.draw(fiolet);
 						}
 
 						if (board1.map[a][b] == '4')
 						{
-							zolte.setPosition(a * board1.width_block, b * board1.width_block);
+							zolte.setPosition(a * board1.width_block - 20, b * board1.width_block - 20);
 							renderWindow.draw(zolte);
+						}
+
+						if (board1.map[a][b] == '5')
+						{
+							biel.setPosition(a * board1.width_block - 20, b * board1.width_block - 20);
+							renderWindow.draw(biel);
 						}
 					}
 
+				}
+
+				//No walls
+				if (snake1.x[0] >= 97)
+				{
+					if (snake1.direction != 1)
+						snake1.x[0] = 1;
+				}
+				if (snake1.x[0] <= 0)
+				{
+					if (snake1.direction != 4)
+						snake1.x[0] = 96;
+				}
+				if (snake1.y[0] >= 55)
+				{
+					if (snake1.direction != 2)
+						snake1.y[0] = 1;
+				}
+				if (snake1.y[0] <= 0)
+				{
+					if (snake1.direction != 3)
+						snake1.y[0] = 54;
 				}
 
 
@@ -260,7 +307,7 @@ int main()
 
 void clear_level()
 {
-	snake1.length = 2;
+	snake1.length = 6;
 	snake1.direction = 4; //STOP-0,LEFT-1,UP-2,DOWN-3,RIGHT-4
 	snake1.point_x = 50;
 	snake1.point_y = 10;
@@ -270,10 +317,9 @@ void clear_level()
 
 	//Map generator
 	lvl1.load();
-
-	for (int a = 0; a < 96; a++)
+	for (int a = 0; a < 98; a++)
 	{
-		for (int b = 0; b < 54; b++)
+		for (int b = 0; b < 56; b++)
 		{
 			board1.map[a][b] = lvl1.matrix[b][a][0];
 			board1.obstacle[a][b] = lvl1.matrix[b][a][0];
