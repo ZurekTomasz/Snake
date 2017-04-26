@@ -2,6 +2,7 @@
 
 sf::RenderWindow renderWindow(sf::VideoMode(1280, 720), "Snake");
 sf::View view1(sf::FloatRect(0, 0, 1920, 1080));
+Files lvl1("lvl1.csv", ',');
 
 sf::Event event1;
 sf::Text text1;
@@ -10,13 +11,13 @@ sf::Font font1;
 class Snake
 {
 	public:
-		#define max_length 100
+		#define max_length 5184
 		int length = 2;
 		int start_x = 30;
 		int start_y = 10;
-		int x[max_length];//Maksymalna dlugosc weza
+		int x[max_length];
 		int y[max_length];
-		int direction = 4; //stop-0,lewo-1,gora-2,dol-3,prawo-4
+		int direction = 4; //STOP-0,LEFT-1,UP-2,DOWN-3,RIGHT-4
 		int point_x = 50;
 		int point_y = 10;
 		int points = 0;
@@ -45,7 +46,7 @@ void clear_level();
 
 int main()
 {
-	//Initiation//
+	//CONFIG//
 	renderWindow.setView(view1);
 	renderWindow.setFramerateLimit(60);
 	sf::Clock clock;
@@ -103,7 +104,7 @@ int main()
 	sf::Sprite fiolet;
 	fiolet.setTexture(t_fiolet);
 
-	
+	//LOGIC//
 	while (renderWindow.isOpen())
 	{
 		renderWindow.clear();
@@ -113,19 +114,13 @@ int main()
 		{
 			case 0:
 			{
-				for (int a = 0; a < 96; a++)
-				{
-					for (int b = 0; b < 54; b++)
-					{
-						board1.obstacle[a][b] = '0';
-						board1.map[a][b] = '0';
-					}
-				}
+				label(30, 30, board1.s_points, 48);
 
-
+				//Changing the position of the snake
 				sf::Time t1 = clock.getElapsedTime();
 				if (t1.asMilliseconds() > 1000.0f / 10.0f)
 				{
+					board1.map[snake1.x[snake1.length - 1]][snake1.y[snake1.length - 1]] = '0';
 					for (int i = snake1.length - 1; i > 0; i--)
 					{
 						snake1.x[i] = snake1.x[i-1];
@@ -158,72 +153,38 @@ int main()
 					clock.restart();
 				}
 
+				//Acquiring a point
 				if (snake1.x[0] == snake1.point_x && snake1.y[0] == snake1.point_y)
 				{
 					snake1.points++;
 					snake1.length++;
 					snake1.point_x = rand() % 90 + 3;
 					snake1.point_y = rand() % 50 + 3;
+
+					board1.s_points = "POINTS: " + std::to_string(snake1.points);
+					cout << board1.s_points << endl;
 				}
 
-				board1.s_points = "POINTS: " + std::to_string(snake1.points);
-				label(30, 30, board1.s_points, 48);
-
-				for (int a = 0; a < 96; a++)
-				{
-					board1.obstacle[a][0] = '4';
-					board1.map[a][0] = '4';
-				}
-
-				for (int a = 0; a < 96; a++)
-				{
-					board1.obstacle[a][53] = '4';
-					board1.map[a][53] = '4';
-				}
-
-				for (int a = 0; a < 54; a++)
-				{
-					board1.obstacle[0][a] = '4';
-					board1.map[0][a] = '4';
-				}
-
-				for (int a = 0; a < 54; a++)
-				{
-					board1.obstacle[95][a] = '4';
-					board1.map[95][a] = '4';
-				}
-
-				/*
-				for (int a = 0; a < 54; a++)
-				{
-					obstacle[35][a] = '4';
-					map[35][a] = '4';
-				}
-
-				for (int a = 0; a < 54; a++)
-				{
-					obstacle[45][a] = '2';
-					map[45][a] = '2';
-				}
-				*/
-
-				board1.map[snake1.x[0]][snake1.y[0]] = '1';//Kolor dziubka
+				//Snake generator
+				board1.map[snake1.x[0]][snake1.y[0]] = '1';//Color snake first block
 				for (int i = 1; i < snake1.length; i++)
 				{
-					board1.map[snake1.x[i]][snake1.y[i]] = '2';//Kolor ogona
+					board1.map[snake1.x[i]][snake1.y[i]] = '2';//Color tail snake
 				}
+				board1.map[snake1.point_x][snake1.point_y] = '3';//Color point
+				board1.map[0][0] = lvl1.matrix[0][0][0];
 
-				board1.map[snake1.point_x][snake1.point_y] = '3';//Kolor punkta
-
+				//Collision with snake tail
 				for (int a = 1; a < snake1.length; a++)
 				{
 					if (snake1.x[0] == snake1.x[a] && snake1.y[0] == snake1.y[a])
 					{
-						printf("Kolizja z ogonem\n");
+						printf("Collision with the tail\n");
 						board1.game_menu = 2;
 					}
 				}
-
+				
+				//Drawing map
 				for (int a = 0; a < 96; a++)
 				{
 					for (int b = 0; b < 54; b++)
@@ -237,9 +198,9 @@ int main()
 
 						if (board1.map[a][b] == '1')
 						{
-							if (board1.obstacle[a][b] == '4' || board1.obstacle[a][b] == '2')
+							if (board1.obstacle[a][b] == '1' || board1.obstacle[a][b] == '4')
 							{
-								printf("Kolizja zwykla\n");
+								printf("Collision with obstacle\n");
 								board1.game_menu = 2;
 							}
 
@@ -255,14 +216,14 @@ int main()
 
 						if (board1.map[a][b] == '3')
 						{
-							zolte.setPosition(a * board1.width_block, b * board1.width_block);
-							renderWindow.draw(zolte);
+							fiolet.setPosition(a * board1.width_block, b * board1.width_block);
+							renderWindow.draw(fiolet);
 						}
 
 						if (board1.map[a][b] == '4')
 						{
-							fiolet.setPosition(a * board1.width_block, b * board1.width_block);
-							renderWindow.draw(fiolet);
+							zolte.setPosition(a * board1.width_block, b * board1.width_block);
+							renderWindow.draw(zolte);
 						}
 					}
 
@@ -300,12 +261,24 @@ int main()
 void clear_level()
 {
 	snake1.length = 2;
-	snake1.direction = 4; //stop-0,lewo-1,gora-2,dol-3,prawo-4
+	snake1.direction = 4; //STOP-0,LEFT-1,UP-2,DOWN-3,RIGHT-4
 	snake1.point_x = 50;
 	snake1.point_y = 10;
 	snake1.points = 0;
 	board1.s_points = "POINTS: 0";
 	label(30, 30, board1.s_points, 48);
+
+	//Map generator
+	lvl1.load();
+
+	for (int a = 0; a < 96; a++)
+	{
+		for (int b = 0; b < 54; b++)
+		{
+			board1.map[a][b] = lvl1.matrix[b][a][0];
+			board1.obstacle[a][b] = lvl1.matrix[b][a][0];
+		}
+	}
 	
 	for (int i = 0; i < snake1.length; i++)
 	{
@@ -368,47 +341,3 @@ void keyboard()
 		}
 	}
 }
-
-
-
-/*
-sf::Vector2u windowSize = renderWindow.getSize();
-sf::Texture texture;
-texture.create(windowSize.x, windowSize.y);
-texture.update(renderWindow);
-sf::Image screenshot = texture.copyToImage();
-
-
-//screenshot.saveToFile("grafika/result.png");
-//476x142
-
-sf::Color color2 = screenshot.getPixel(476, 142);
-cout << "R: " << (int)color2.r  << "G: " << (int)color2.g  << "B: " << (int)color2.b << endl;
-//_getch();
-*/
-
-/*
-// Load an image file from a file
-sf::Image background;
-background.loadFromFile("grafika/image1.bmp");
-
-sf::Image image;
-image.create((int)background.getSize().x, (int)background.getSize().y, sf::Color::Black);
-image.copy(background, 0, 0);
-sf::Color color = image.getPixel(10, 90);
-cout << "R: " << (int)color.r << endl << "G: " << (int)color.g << endl << "B: " << (int)color.b << endl;
-image.saveToFile("grafika/result.png");
-
-for (int i = 0; i < snake1.length; i++)
-{
-snake1.x[i] = 30 - i;
-snake1.y[i] = 10;
-}
-*/
-
-/*
-sf::Image screenshot;
-screenshot = renderWindow.capture();
-screenshot.saveToFile("grafika/result.png");
-renderWindow.capture().saveToFile("grafika/result.png");
-*/
