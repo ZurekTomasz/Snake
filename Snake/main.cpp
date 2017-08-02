@@ -49,6 +49,8 @@ void clear_level();
 
 int main()
 {
+
+
 	//CONFIG//
 	renderWindow.setView(view1);
 	renderWindow.setFramerateLimit(60);
