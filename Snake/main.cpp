@@ -1,8 +1,8 @@
 #include "stdafx.h"
 
 sf::RenderWindow renderWindow(sf::VideoMode(1280, 720), "Snake");
-sf::View view1(sf::FloatRect(0, 0, 1920, 1080));
-Files lvl1("lvl2.csv", ',');
+sf::View view1(sf::FloatRect(0, 0, 1280, 720));
+Files lvl1("lvl4.csv", ',');
 
 sf::Event event1;
 sf::Text text1;
@@ -10,15 +10,15 @@ sf::Font font1;
 
 class Snake
 {
-	public:
-		#define max_length 5184
+public:
+	#define max_length 700
 		int length = 2;
-		int start_x = 30;
+		int start_x = 10;
 		int start_y = 10;
 		int x[max_length];
 		int y[max_length];
 		int direction = 4; //STOP-0,LEFT-1,UP-2,DOWN-3,RIGHT-4
-		int point_x = 50;
+		int point_x = 20;
 		int point_y = 10;
 		int points = 0;
 };
@@ -28,13 +28,13 @@ Snake snake1;
 class Board
 {
 	public:
-		#define d_row 98 //96+2
-		#define d_column 56 //54+2
+	#define d_row 34 //96+2
+	#define d_column 20 //54+2
 		int row = d_row;
 		int column = d_column;
 		char map[d_row][d_column];
 		char obstacle[d_row][d_column];
-		int width_block = 20;
+		int width_block = 40;
 
 		int game_menu = 1;
 		string s_points = "POINTS: 0";
@@ -166,14 +166,14 @@ int main()
 				if (snake1.x[0] == snake1.point_x && snake1.y[0] == snake1.point_y)
 				{
 					snake1.points++;
-					snake1.length++;
+					snake1.length++; 
 
-					bool coltail = false;
+					bool coltail = false; 
 					do 
 					{
 						coltail = false;;
-						snake1.point_x = rand() % 96 + 2;
-						snake1.point_y = rand() % 54 + 2;
+						snake1.point_x = rand() % d_row;
+						snake1.point_y = rand() % d_column;
 
 						for (int a = 1; a < snake1.length; a++)
 						{
@@ -211,7 +211,6 @@ int main()
 				{
 					for (int b = 0; b < board1.column; b++)
 					{
-
 						if (board1.map[a][b] == '0')
 						{
 							trawa.setPosition(a * board1.width_block - board1.width_block, b * board1.width_block - board1.width_block);
@@ -312,7 +311,7 @@ void clear_level()
 {
 	snake1.length = 6;
 	snake1.direction = 4; //STOP-0,LEFT-1,UP-2,DOWN-3,RIGHT-4
-	snake1.point_x = 50;
+	snake1.point_x = 20;
 	snake1.point_y = 10;
 	snake1.points = 0;
 	board1.s_points = "POINTS: 0";
